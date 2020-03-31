@@ -1,17 +1,20 @@
 ;(function() {
   const {
     solactive_data,
-    admin_ajax,
-    site_url,
-    plugin_slug
+    // admin_ajax,
+    // site_url,
+    // plugin_slug
   } = wp_data;
   
   const {
     body,
     response,
-    errors
+    query,
+    errors,
   } = solactive_data;
   
+console.log(query)
+
   const errorMsg = document.getElementById('g-charts-error')
   let error = null
   
@@ -19,7 +22,7 @@
   
   // all good?
   if (!response || response.code !== 200 || !!errors) {
-    error = 'Error: Solactive API error';
+    error = 'Solactive API error';
     setError(error);
     throw new Error();
   }
@@ -29,14 +32,29 @@
     throw new Error(error);
   }
   
+  Date.prototype.toDateInputValue = (function() {
+    var local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0, 10);
+  });
+
   // yep, let's go
   const data = JSON.parse(body);
   const ctx = document.getElementById('g-chart').getContext('2d');
   const indexID = document.getElementById('indexID');
-  const labels = data.map(d => d.timestamp);
+  const resolutionInput = document.getElementById('resolution');
+  const fromInput = document.getElementById('from');
+  const toInput = document.getElementById('to');
+
+  fromInput.value = new Date(query.from).toDateInputValue()
+  toInput.value = new Date(query.to).toDateInputValue()
+
+  const labels = data.map(d => new Date(d.timestamp).toUTCString());
   const values = data.map(d => d.value);
-  
-  indexID.innerText = data[0].indexId;
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(1, 'rgba(232,243,239,.4)');   
+  gradient.addColorStop(0, 'rgba(154,221,118,1)');
   
   const gChart = new Chart(ctx, {
     type: 'line',
@@ -45,6 +63,7 @@
       datasets: [{
         label: 'Index value',
         data: values,
+        backgroundColor: gradient,
         // backgroundColor: [
         //     'rgba(255, 99, 132, 0.2)',
         //     'rgba(54, 162, 235, 0.2)',
@@ -61,7 +80,7 @@
         //     'rgba(153, 102, 255, 1)',
         //     'rgba(255, 159, 64, 1)'
         // ],
-        // borderWidth: 1
+        // borderWidth: 1,
       }]
     },
   })  
