@@ -4,7 +4,10 @@ function g_charts_shortcode( $atts ) {
 	$html = '
 		<h2>Cannabis World Index</h2>
 		<div id="g-charts-toolbar">
-			<span class="indexID">Index ID: <strong>DE000SLA63U0</strong></span>
+			<span class="indexID">
+				Index ID: <strong>DE000SLA63U0</strong>
+			</span>
+			<span id="g-charts-loading"></span>
 	';
 
 	// foreach(['DAY', 'MONTH', 'YEAR'] as $resolution) {
