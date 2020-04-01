@@ -4,27 +4,22 @@ function g_charts_shortcode( $atts ) {
 	$html = '
 		<h2>Cannabis World Index</h2>
 		<div id="g-charts-toolbar">
-			<label class="indexID" for="indexID">
-				Index ID:
-				<select id="indexID">
-					<option value="DE000SLA63U0">DE000SLA63U0</option>
-				</select>
-			</label>
+			<span class="indexID">Index ID: <strong>DE000SLA63U0</strong></span>
 	';
 
-	foreach(['DAY', 'MONTH', 'YEAR'] as $resolution) {
-		$html .= "
-			<label for='$resolution'>
-				<input
-					id='$resolution'
-					value='$resolution'
-					name='resolution'
-					class='toggle-resolution'
-					type='checkbox' 
-				/> $resolution
-			</label>
-		";
-	}
+	// foreach(['DAY', 'MONTH', 'YEAR'] as $resolution) {
+	// 	$html .= "
+	// 		<label for='$resolution'>
+	// 			<input
+	// 				id='$resolution'
+	// 				value='$resolution'
+	// 				name='resolution'
+	// 				class='toggle-resolution'
+	// 				type='checkbox' 
+	// 			/> $resolution
+	// 		</label>
+	// 	";
+	// }
 
 	$html .= '
 			<label for="from">From</label>

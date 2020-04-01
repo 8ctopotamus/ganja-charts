@@ -1,4 +1,18 @@
 <?php
+
+// routes
+add_action( 'admin_post_nopriv_g_charts_actions', 'g_charts_actions' );
+add_action( 'admin_post_g_charts_actions', 'g_charts_actions' );
+function g_charts_actions() {
+	if (empty($_GET['from']) || empty($_GET['to'])) {
+		echo 'Error: Date range not provided';
+		die();
+	}
+	$data = fetch_solactive_data($_GET['from'], $_GET['to']);
+	echo json_encode($data);
+	die();
+}
+
 // enqueue scripts + styles
 add_action( 'wp_enqueue_scripts', 'g_charts_load_shortcode_resources' );
 function g_charts_load_shortcode_resources() {
@@ -22,7 +36,6 @@ function g_charts_load_shortcode_resources() {
 	if ( $shortcode_found ) {
 		wp_enqueue_style( 'g_charts_style' );
 		wp_enqueue_script( 'chartjs' );
-
 		$defaultFrom = new DateTime('first day of January this year');
 		$defaultTo = new DateTime('first day of January next year');
 		$fromTimestamp = $defaultFrom->getTimestamp() * 1000;
