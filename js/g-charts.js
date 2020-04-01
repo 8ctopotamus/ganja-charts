@@ -1,4 +1,5 @@
 ;(function() {
+
   Date.prototype.toDateInputValue = (function() {
     var local = new Date(this);
     local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
@@ -10,7 +11,8 @@
     ajax_url,
   } = wp_data;
   
-  const ctx = document.getElementById('g-chart').getContext('2d');
+  const canvas = document.getElementById('g-chart');
+  const ctx = canvas.getContext('2d');
   const loading = document.getElementById('g-charts-loading');
   const fromInput = document.getElementById('from');
   const toInput = document.getElementById('to');
@@ -21,7 +23,11 @@
     ? loading.style.display = 'block' 
     : loading.style.display = 'none';
 
-  const setError = val => errorMsg.innerHTML = val
+  const setError = val => {
+    errorMsg.innerHTML = val;
+    val ? canvas.style.display = 'none'
+        : canvas.style.display = 'block';
+  }
 
   const dateFromTimestamp = ts => {
     const parts = new Date(ts).toUTCString().split(' ');
@@ -47,7 +53,7 @@
           backgroundColor: gradient,
         }]
       },
-    })  
+    });
   }
 
   const parseSolactiveData = (solactive_data) => {
@@ -57,23 +63,22 @@
       query,
       errors,
     } = solactive_data;
-    
+
     if (!response || response.code !== 200 || !!errors) {
       error = 'Solactive API error';
       setError(error);
       throw new Error();
     } else if (body === '[ ]') {
       error = 'No results';
-      setError(error)
+      setError(error);
       throw new Error(error);
     }
     
-    drawChart(JSON.parse(body))
+    drawChart(JSON.parse(body));
   }
   
   const handleDateChange = () => {
     setLoading(true);
-    setError(null);
     const url = new URL(ajax_url);
     const params = {
       action: 'g_charts_actions',
@@ -85,10 +90,11 @@
     fetch(url)
       .then(res => res.json())
       .then(json => {
-        setLoading(false)
-        parseSolactiveData(json)
+        setLoading(false);
+        setError(null);
+        parseSolactiveData(json);
       })
-      .catch(err => console.error(err))
+      .catch(err => console.error(err));
   }
 
   fromInput.addEventListener('change', handleDateChange);
