@@ -1,3 +1,25 @@
+svg {
+  font: 10px sans-serif;
+}
+
+.area {
+  fill: steelblue;
+  clip-path: url(#clip);
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
 #g-charts-toolbar {
   display: flex;
   align-items: center;
@@ -17,24 +39,8 @@
   width: auto;
 }
 
-#g-charts-loading {
-  display: none;
-  border: 5px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 5px solid #9edd7a;
-  width: 20px;
-  height: 20px;
-  -webkit-animation: spin 1.2s linear infinite; /* Safari */
-  animation: spin 1.2s linear infinite;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+#g-chart-stats {
+  display: grid;
+  grid-gap: 30px;
+  grid-template-columns: 1fr 1fr;
 }

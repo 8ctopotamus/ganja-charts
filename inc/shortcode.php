@@ -1,30 +1,18 @@
 <?php
 // shortcode
 function g_charts_shortcode( $atts ) {
+	$resolutions = ['1 Week', '1 Month', '3 Months', '1 YEAR', '5 Years', 'Ytd', 'Max'];
+
 	$html = '
 		<h2>Cannabis World Index</h2>
 		<div id="g-charts-toolbar">
-			<span class="indexID">
-				Index ID: <strong>DE000SLA63U0</strong>
-			</span>
-			<span id="g-charts-loading"></span>
 	';
 
-	// foreach(['DAY', 'MONTH', 'YEAR'] as $resolution) {
-	// 	$html .= "
-	// 		<label for='$resolution'>
-	// 			<input
-	// 				id='$resolution'
-	// 				value='$resolution'
-	// 				name='resolution'
-	// 				class='toggle-resolution'
-	// 				type='checkbox' 
-	// 			/> $resolution
-	// 		</label>
-	// 	";
-	// }
+		foreach($resolutions as $resolution) {
+			$html .= "<button class='btn-resolution' data-resolution='$resolution'>$resolution</button>";
+		}
 
-	$html .= '
+		$html .= '
 			<label for="from">From</label>
 			<input id="from" name="from" type="date" />
 			<label for="to">To</label>
@@ -33,10 +21,50 @@ function g_charts_shortcode( $atts ) {
 		
 		<p id="g-charts-error" style="color: red;"></p>
 
-		<div class="chart-container" 
-			style="position: relative; height:auto; width:100%">
-			<canvas id="g-chart"></canvas>
+		<div id="g-chart-d3"></div>
+
+		<div id="g-chart-stats">
+			<div>
+				<h3>Master Data</h3>
+				<table>
+					<tr>
+						<th>ISIN</th>
+						<td>DE000SLA63U0</td>
+					</tr>
+					<tr>
+						<th>Bloomberg Ticker</th>
+						<td>CANWLDGR Index</td>
+					</tr>
+					<tr>
+						<th>WKN</th>
+						<td>SLA63U</td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<h3>Current Quotes</h3>
+				<table>
+					<tr>
+						<th><small>Last quote</small><br/> <span id="last-quote-date"></span></th>
+						<td><span id="last-quote-value"></span></td>
+					</tr>
+					<tr>
+						<th>Day range</th>
+						<td>No data from our Endpoint (28.73 / 29.52)</td>
+					</tr>
+					<tr>
+						<th>Change abs./rel.</th>
+						<td>No data from our Endpoint  (-0.39 / -1.32)</td>
+					</tr>
+					<tr>
+						<th>Year range</th>
+						<td>No data from our Endpoint  (21.84 / 119.32)</td>
+					</tr>
+				</table>
+			</div>
 		</div>
+
+		<p><small>Please note that the index chart above may be partly comprised of historical performance illustration based on a backtest. The guideline provides an indication where this is the case.</small></p>
 	';
 
 	return $html;
