@@ -45,20 +45,19 @@ function g_charts_shortcode( $atts ) {
 				<h3>Current Quotes</h3>
 				<table>
 					<tr>
-						<th><small>Last quote</small><br/> <span id="last-quote-date"></span></th>
+						<th>
+							<small>Last quote</small><br/>
+							<span id="last-quote-date"></span>
+						</th>
 						<td><span id="last-quote-value"></span></td>
 					</tr>
 					<tr>
-						<th>Day range</th>
-						<td>No data from our Endpoint (28.73 / 29.52)</td>
-					</tr>
-					<tr>
-						<th>Change abs./rel.</th>
-						<td>No data from our Endpoint  (-0.39 / -1.32)</td>
+						<th>Day change</th>
+						<td><span id="day-change"></span></td>
 					</tr>
 					<tr>
 						<th>Year range</th>
-						<td>No data from our Endpoint  (21.84 / 119.32)</td>
+						<td><span id="year-range"></span></td>
 					</tr>
 				</table>
 			</div>

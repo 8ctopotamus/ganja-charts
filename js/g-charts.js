@@ -38,7 +38,6 @@
       query,
       errors,
     } = solactive_data;
-
     if (!response || response.code !== 200 || !!errors) {
       error = 'Solactive API error';
       setError(error);
@@ -140,6 +139,7 @@
         .attr("height", height2 + 7);
 
     function brushed() {
+      console.log('brushed')
       x.domain(brush.empty() ? x2.domain() : brush.extent());
       focus.select(".area").attr("d", area);
       focus.select(".x.axis").call(xAxis);
@@ -153,6 +153,7 @@
     }
 
     function zoomed() {
+      console.log('zoomed')
       let t = 	d3.event.translate;
       let s = 	d3.event.scale;
       let size = width*s;
@@ -179,6 +180,30 @@
     // ...
   };
 
+  function renderStats() {
+    const dates = data.map(d => dateFromTimestamp(d.timestamp));
+    const values = data.map(d => d.value);
+    const lastQuoteDate = dates[dates.length - 1];
+    const lastQuoteValue = parseFloat(values[values.length - 1]);
+    const prevQuoteValue = parseFloat(values[values.length - 2]);
+    document.getElementById('last-quote-date').innerText = lastQuoteDate;
+    document.getElementById('last-quote-value').innerText = lastQuoteValue;
+    document.getElementById('day-change').innerText = `
+      Prev ${prevQuoteValue} | Current: ${lastQuoteValue}
+      Difference: ${(lastQuoteValue - prevQuoteValue).toFixed(2)}
+    `;
+    // Year range can show the highest and lowest closing prices since January 1.
+    const d = new Date();
+    const currentYear = d.getFullYear();
+    const jan1Idx = dates.findIndex(d => {
+      return d.split(' ')[3] == currentYear;
+    });
+    const yearSlice = data.slice(jan1Idx);
+    const max = yearSlice.reduce((max, p) => p.value > max ? p.value : max, data[0].value);      
+    const min = yearSlice.reduce((min, p) => p.value < min ? p.value : min, data[0].value);
+    document.getElementById('year-range').innerText = `High: ${max} | Low: ${min}`;
+  }
+
   const init = () => {
     fromInput.addEventListener('change', handleDateChange);
     toInput.addEventListener('change', handleDateChange);
@@ -186,8 +211,7 @@
     toInput.value = new Date(solactive_data.query.to).toDateInputValue();
     data = parseSolactiveData(solactive_data);
     if (data) {
-      const dates = data.map(d => dateFromTimestamp(d.timestamp));
-      document.getElementById('last-quote-date').innerText = dates[dates.length - 1];
+      renderStats(data);
       drawChart();
     }
   };
