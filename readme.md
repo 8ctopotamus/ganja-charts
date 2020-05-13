@@ -12,3 +12,6 @@ https://clients.solactive.com/api/rest/v1/indices/API_KEY_HERE/DE000SLA63U0/hist
 
 ## D3 Example!
 https://observablehq.com/@d3/focus-context
+
+http://bl.ocks.org/timelyportfolio/5c136de85de1c2abb6fc
+https://bl.ocks.org/micahstubbs/3cda05ca68cba260cb81

@@ -32,6 +32,11 @@
   }
 
   const parseSolactiveData = (solactive_data) => {
+    if (!solactive_data) {
+      error = 'No Solactive data';
+      setError(error);
+      throw new Error();
+    }
     const {
       body,
       response,
@@ -186,9 +191,11 @@
       let t = (s[0]-s_orig[0])/(s_orig[1]-s_orig[0]); 
       let trans = width*newS*t;
       zoom.scale(newS);
-      zoom.translate([-trans,0]);
+      zoom.translate([-trans, 0]);
 
-      let brushExtent = [x.invert(300), x.invert(width)];
+      // 3mo = 760
+      // 1yr = 320
+      let brushExtent = [x.invert(320), x.invert(width)];
       context.select(".brush").call(brush.extent(brushExtent));
     };
 
@@ -203,7 +210,14 @@
 
 
   function renderStats() {
-    const dates = data.map(d => dateFromTimestamp(d.timestamp));
+    const dates = data.map((d, i) => {
+      if (i === 0) {
+        console.log('Start:', dateFromTimestamp(d.timestamp))
+      } else if (i === data.length - 1) {
+        console.log('End:', dateFromTimestamp(d.timestamp))
+      }
+      return dateFromTimestamp(d.timestamp)
+    });
     const values = data.map(d => d.value);
     const lastQuoteDate = dates[dates.length - 1];
     const lastQuoteValue = parseFloat(values[values.length - 1]);
