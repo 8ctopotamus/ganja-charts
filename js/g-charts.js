@@ -38,6 +38,7 @@
       query,
       errors,
     } = solactive_data;
+    console.log(solactive_data)
     if (!response || response.code !== 200 || !!errors) {
       error = 'Solactive API error';
       setError(error);
@@ -96,7 +97,6 @@
     let context = svg.append("g")
         .attr("class", "context")
         .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
-      
 
     x.domain(d3.extent(data.map(function(d) { return d.timestamp; })));
     y.domain([0, parseFloat(d3.max(data.map(function(d) { return d.value; }))) + 30]);
@@ -139,7 +139,6 @@
         .attr("height", height2 + 7);
 
     function brushed() {
-      console.log('brushed')
       x.domain(brush.empty() ? x2.domain() : brush.extent());
       focus.select(".area").attr("d", area);
       focus.select(".x.axis").call(xAxis);
@@ -153,9 +152,8 @@
     }
 
     function zoomed() {
-      console.log('zoomed')
-      let t = 	d3.event.translate;
-      let s = 	d3.event.scale;
+      let t = d3.event.translate;
+      let s = d3.event.scale;
       let size = width*s;
       t[0] = Math.min(t[0], 0);
       t[0] = Math.max(t[0], width-size);
@@ -167,18 +165,42 @@
       context.select(".brush").call(brush.extent(brushExtent));
     }
 
-    function type(d) {
-      d.timestamp = parseDate(d.timestamp);
-      d.value = +d.value;
-      return d;
-    }
+    const handleDateChange = (e) => {
+      console.log(e.target.dataset.resolution)
+      // const from = new Date(fromInput.value).getTime();
+      // const to = new Date(toInput.value).getTime();
+
+      // focus.select(".area").attr("d", area);
+      // focus.select(".x.axis").call(xAxis);
+      // const defaultSelection = [x(d3.utcYear.offset(x.domain()[1], -1)), x.range()[1]];
+      // context.call(brush.move, defaultSelection);
+
+      // zoom.x(d3.time.scale().range([50, 100]))
+
+      x.domain(brush.empty() ? x2.domain() : brush.extent());
+      focus.select(".area").attr("d", area);
+      focus.select(".x.axis").call(xAxis);
+      let s = x.domain();
+      let s_orig = x2.domain();
+      let newS = (s_orig[1]-s_orig[0])/(s[1]-s[0]);
+      let t = (s[0]-s_orig[0])/(s_orig[1]-s_orig[0]); 
+      let trans = width*newS*t;
+      zoom.scale(newS);
+      zoom.translate([-trans,0]);
+
+      let brushExtent = [x.invert(300), x.invert(width)];
+      context.select(".brush").call(brush.extent(brushExtent));
+    };
+
+    // wire up controls
+    fromInput.addEventListener('change', handleDateChange);
+    toInput.addEventListener('change', handleDateChange);
+    fromInput.value = new Date(solactive_data.query.from).toDateInputValue();
+    toInput.value = new Date(solactive_data.query.to).toDateInputValue();
+    const btns = Array.from(document.querySelectorAll('.btn-resolution'))
+    btns.forEach(btn => btn.addEventListener('click', handleDateChange))
   };
 
-  const handleDateChange = () => {
-    const from = new Date(fromInput.value).getTime();
-    const to = new Date(toInput.value).getTime();
-    // ...
-  };
 
   function renderStats() {
     const dates = data.map(d => dateFromTimestamp(d.timestamp));
@@ -188,9 +210,7 @@
     const prevQuoteValue = parseFloat(values[values.length - 2]);
     document.getElementById('last-quote-date').innerText = lastQuoteDate;
     document.getElementById('last-quote-value').innerText = lastQuoteValue;
-    document.getElementById('day-change').innerText = `
-      Prev ${prevQuoteValue} | Current: ${lastQuoteValue}
-      Difference: ${(lastQuoteValue - prevQuoteValue).toFixed(2)}
+    document.getElementById('day-change').innerText = `Prev: ${prevQuoteValue} - Current: ${lastQuoteValue} = Difference: ${(lastQuoteValue - prevQuoteValue).toFixed(2)}
     `;
     // Year range can show the highest and lowest closing prices since January 1.
     const d = new Date();
@@ -202,16 +222,23 @@
     const max = yearSlice.reduce((max, p) => p.value > max ? p.value : max, data[0].value);      
     const min = yearSlice.reduce((min, p) => p.value < min ? p.value : min, data[0].value);
     document.getElementById('year-range').innerText = `High: ${max} | Low: ${min}`;
+  
+    // Change abs = the return over a one day span.
+    // Today's close minus yesterday's close = abs.
+    // 28.35 - 28.80 = -.45
+    
+    // rel appears to be relative change, and is the abs expressed in a percentage I think.
+    // (28.35 - 28.80) / 28.80 = 1.56
+    
+    // These are for April 21, with 28.35 being today's stated close and 28.80 being yesterday's.
+  
+  
   }
 
   const init = () => {
-    fromInput.addEventListener('change', handleDateChange);
-    toInput.addEventListener('change', handleDateChange);
-    fromInput.value = new Date(solactive_data.query.from).toDateInputValue();
-    toInput.value = new Date(solactive_data.query.to).toDateInputValue();
     data = parseSolactiveData(solactive_data);
     if (data) {
-      renderStats(data);
+      renderStats();
       drawChart();
     }
   };
