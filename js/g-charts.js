@@ -5,7 +5,7 @@
     return local.toJSON().slice(0, 10);
   });
 
-  const { solactive_data, ajax_url } = wp_data;
+  const { solactive_data } = wp_data;
   const fromInput = document.getElementById('from');
   const toInput = document.getElementById('to');
   const errorMsg = document.getElementById('g-charts-error');
@@ -19,7 +19,7 @@
   let data = null;
   let error = null;
 
-  const parseDate = d3.time.format("%s").parse;
+  // const parseDate = d3.time.format("%s").parse;
 
   const setError = val => {
     errorMsg.innerHTML = val;
@@ -43,7 +43,6 @@
       query,
       errors,
     } = solactive_data;
-    console.log(solactive_data)
     if (!response || response.code !== 200 || !!errors) {
       error = 'Solactive API error';
       setError(error);
@@ -173,44 +172,49 @@
     function handleDateChange() {
       const from = new Date(fromInput.value).getTime();
       const to = new Date(toInput.value).getTime();
-      // define our new brush extent
       brush.extent([from, to])
-      // now draw the brush to match our extent
-      // use transition to slow it down so we can see what is happening
-      // remove transition so just d3.select(".brush") to just draw
       brush(d3.select('.brush').transition())
-      // now fire the brushstart, brushmove, and brushend events
-      // remove transition so just d3.select(".brush") to just draw
       brush.event(d3.select('.brush').transition().delay(1000))
     }
 
+    function handleButtonClick() {
+      fromInput.value = new Date(this.dataset.from).toDateInputValue();
+      toInput.value = new Date().toDateInputValue();
+      handleDateChange()
+    }
+
+    // set controls defaults
+    const dates = data.map(function(d) { return d.timestamp; })
+    const min = d3.min(dates)
+    const max = d3.max(dates)
+    fromInput.value = new Date(min).toDateInputValue();
+    toInput.value = new Date(max).toDateInputValue();
+    fromInput.min = new Date(min).toDateInputValue();
+    fromInput.max = new Date(max).toDateInputValue();
+    toInput.min = new Date(min).toDateInputValue();
+    toInput.max = new Date(max).toDateInputValue();
     // wire up controls
     fromInput.addEventListener('change', handleDateChange);
     toInput.addEventListener('change', handleDateChange);
-    fromInput.value = new Date(solactive_data.query.from).toDateInputValue();
-    toInput.value = new Date(solactive_data.query.to).toDateInputValue();
     const btns = Array.from(document.querySelectorAll('.btn-resolution'))
-    btns.forEach(btn => btn.addEventListener('click', handleDateChange))
+    btns.forEach(function(btn) {
+      if (btn.dataset.resolution === 'Max') {
+        btn.dataset.from = dateFromTimestamp(min)
+      }
+      btn.addEventListener('click', handleButtonClick)
+    })
   };
 
-
   function renderStats() {
-    const dates = data.map((d, i) => {
-      if (i === 0) {
-        console.log('Start:', dateFromTimestamp(d.timestamp))
-      } else if (i === data.length - 1) {
-        console.log('End:', dateFromTimestamp(d.timestamp))
-      }
-      return dateFromTimestamp(d.timestamp)
-    });
+    const dates = data.map(d => dateFromTimestamp(d.timestamp));
     const values = data.map(d => d.value);
     const lastQuoteDate = dates[dates.length - 1];
     const lastQuoteValue = parseFloat(values[values.length - 1]);
     const prevQuoteValue = parseFloat(values[values.length - 2]);
     document.getElementById('last-quote-date').innerText = lastQuoteDate;
     document.getElementById('last-quote-value').innerText = lastQuoteValue;
-    document.getElementById('day-change').innerText = `Prev: ${prevQuoteValue} - Current: ${lastQuoteValue} = Difference: ${(lastQuoteValue - prevQuoteValue).toFixed(2)}
-    `;
+    document.getElementById('day-change').innerText = `Prev: ${prevQuoteValue} - Current: ${lastQuoteValue} = Difference: ${(lastQuoteValue - prevQuoteValue).toFixed(2)}`;
+
     // Year range can show the highest and lowest closing prices since January 1.
     const d = new Date();
     const currentYear = d.getFullYear();

@@ -8,15 +8,26 @@ function g_charts_shortcode( $atts ) {
 		<div id="g-charts-toolbar">
 	';
 
+	$now = new DateTime('now');
+	$currentYear = $now->format('Y');
 	foreach($resolutions as $resolution) {
-		$html .= "<button class='btn-resolution' data-resolution='$resolution'>$resolution</button>";
+		if ($resolution == 'Max') {
+			$fromDate='';
+		} else if ($resolution == 'Ytd') {
+			$fromDate = $now->modify('first day of January ' . $currentYear);
+			$fromDate = $fromDate->format('Y-m-d h:i:s');
+		} else {
+			$fromDate = $now->modify("-$resolution");
+			$fromDate = $fromDate->format('Y-m-d h:i:s');
+		}
+		$html .= "<button class='btn-resolution' data-resolution='$resolution' data-from='$fromDate'>$resolution</button>";
 	}
 
 	$html .= '
 			<label for="from">From</label>
 			<input id="from" name="from" type="date" />
 			<label for="to">To</label>
-			<input id="to" name="to" type="date" value="' . date('Y-m-d') . '" max="' . date('Y-m-d') . '" />
+			<input id="to" name="to" type="date" />
 		</div><!-- /toolbar -->
 		
 		<p id="g-charts-error" style="color: red;"></p>
