@@ -13,5 +13,23 @@ https://clients.solactive.com/api/rest/v1/indices/API_KEY_HERE/DE000SLA63U0/hist
 ## D3 Example!
 https://observablehq.com/@d3/focus-context
 
+### Reading
+
 http://bl.ocks.org/timelyportfolio/5c136de85de1c2abb6fc
 https://bl.ocks.org/micahstubbs/3cda05ca68cba260cb81
+
+https://www.d3-graph-gallery.com/graph/line_brushZoom.html
+
+https://stackoverflow.com/questions/38150969/d3-how-to-handle-zooming-and-tooltips-in-a-single-chart
+
+https://blockbuilder.org/nivas8292/222939d7c74c5de09387
+
+http://bl.ocks.org/linssen/7352810
+
+https://blockbuilder.org/nivas8292/222939d7c74c5de09387
+
+https://observablehq.com/@d3/click-to-recenter-brush
+
+https://github.com/d3/d3-zoom/issues/48
+
+https://www.d3indepth.com/scales/

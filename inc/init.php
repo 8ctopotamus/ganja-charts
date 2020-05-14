@@ -34,13 +34,13 @@ function g_charts_load_shortcode_resources() {
 	}
 	
 	if ( $shortcode_found ) {
-		$testing = true;
+		$testing = fa;se; // DEVS
 		wp_enqueue_style( 'g_charts_style' );
 		wp_enqueue_script( 'd3' );
 		$defaultTo = new DateTime('first day of January next year');
 		$toTimestamp = $defaultTo->getTimestamp() * 1000;
 		
-		if (!$testing) {
+		if 	(!$testing) {
 			$solactive_data = fetch_solactive_data(1520118000000, $toTimestamp);
 		} else {
 			$string = file_get_contents(plugin_dir_url( __DIR__ ) . "js/test_data.json");
