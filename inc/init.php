@@ -34,7 +34,7 @@ function g_charts_load_shortcode_resources() {
 	}
 	
 	if ( $shortcode_found ) {
-		$testing = fa;se; // DEVS
+		$testing = false; // DEVS
 		wp_enqueue_style( 'g_charts_style' );
 		wp_enqueue_script( 'd3' );
 		$defaultTo = new DateTime('first day of January next year');

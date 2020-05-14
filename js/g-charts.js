@@ -170,34 +170,19 @@
       context.select(".brush").call(brush.extent(brushExtent));
     }
 
-    const handleDateChange = (e) => {
-      console.log(e.target.dataset.resolution)
-      // const from = new Date(fromInput.value).getTime();
-      // const to = new Date(toInput.value).getTime();
-
-      // focus.select(".area").attr("d", area);
-      // focus.select(".x.axis").call(xAxis);
-      // const defaultSelection = [x(d3.utcYear.offset(x.domain()[1], -1)), x.range()[1]];
-      // context.call(brush.move, defaultSelection);
-
-      // zoom.x(d3.time.scale().range([50, 100]))
-
-      x.domain(brush.empty() ? x2.domain() : brush.extent());
-      focus.select(".area").attr("d", area);
-      focus.select(".x.axis").call(xAxis);
-      let s = x.domain();
-      let s_orig = x2.domain();
-      let newS = (s_orig[1]-s_orig[0])/(s[1]-s[0]);
-      let t = (s[0]-s_orig[0])/(s_orig[1]-s_orig[0]); 
-      let trans = width*newS*t;
-      zoom.scale(newS);
-      zoom.translate([-trans, 0]);
-
-      // 3mo = 760
-      // 1yr = 320
-      let brushExtent = [x.invert(320), x.invert(width)];
-      context.select(".brush").call(brush.extent(brushExtent));
-    };
+    function handleDateChange() {
+      const from = new Date(fromInput.value).getTime();
+      const to = new Date(toInput.value).getTime();
+      // define our new brush extent
+      brush.extent([from, to])
+      // now draw the brush to match our extent
+      // use transition to slow it down so we can see what is happening
+      // remove transition so just d3.select(".brush") to just draw
+      brush(d3.select('.brush').transition())
+      // now fire the brushstart, brushmove, and brushend events
+      // remove transition so just d3.select(".brush") to just draw
+      brush.event(d3.select('.brush').transition().delay(1000))
+    }
 
     // wire up controls
     fromInput.addEventListener('change', handleDateChange);
@@ -244,9 +229,7 @@
     // rel appears to be relative change, and is the abs expressed in a percentage I think.
     // (28.35 - 28.80) / 28.80 = 1.56
     
-    // These are for April 21, with 28.35 being today's stated close and 28.80 being yesterday's.
-  
-  
+    // These are for April 21, with 28.35 being today's stated close and 28.80 being yesterday's.  
   }
 
   const init = () => {
