@@ -20,6 +20,12 @@
   let error = null;
 
   // const parseDate = d3.time.format("%s").parse;
+  var parseDate = d3.time.format("%m/%e/%Y").parse,
+      bisectDate = d3.bisector(function(d) { console.log(d); return d.timestamp; }).left,
+      formatValue = d3.format(","),
+      dateFormatter = d3.time.format("%m/%d/%y");
+  // var bisect = d3.bisector(function(d) { return d.x; }).left;
+  // const bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
   const setError = val => {
     errorMsg.innerHTML = val;
@@ -141,6 +147,58 @@
       .selectAll("rect")
         .attr("y", -6)
         .attr("height", height2 + 7);
+
+    var info = focus.append("g")
+        .attr("class", "info")
+        .style("display", "none");
+
+    info.append("circle")
+        .attr("r", 5);
+
+    info.append("rect")
+        .attr("class", "tooltip")
+        .attr("width", 100)
+        .attr("height", 50)
+        .attr("x", 10)
+        .attr("y", -22)
+        .attr("rx", 4)
+        .attr("ry", 4);
+
+    info.append("text")
+        .attr("class", "tooltip-date")
+        .attr("x", 18)
+        .attr("y", -2);
+
+    info.append("text")
+        .attr("x", 18)
+        .attr("y", 18)
+        .text("Value:");
+
+    const valuesInfo = info.append("text")
+        .attr("class", "tooltip-values")
+        .attr("x", 60)
+        .attr("y", 18);
+
+    focus.append("rect")
+        .attr("class", "overlay")
+        .attr("width", width)
+        .attr("height", height)
+        .on("mouseover", function() { info.style("display", null); })
+        .on("mouseout", function() { info.style("display", "none"); })
+        .on("mousemove", mousemove);
+
+    function mousemove() {
+      console.log('mousemove')
+        var x0 = x.invert(d3.mouse(this)[0]),
+            i = bisectDate(data, x0, 1),
+            d0 = data[i - 1],
+            d1 = data[i],
+            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+        info.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
+        info.select(".tooltip-date").text(dateFromTimestamp(d.timestamp));
+        info.select(".tooltip-values").text(d.value);
+    }
+
 
     function brushed() {
       x.domain(brush.empty() ? x2.domain() : brush.extent());

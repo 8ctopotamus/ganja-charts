@@ -20,6 +20,10 @@ svg {
   shape-rendering: crispEdges;
 }
 
+.focus circle {
+  fill: steelblue;
+}
+
 #g-charts-toolbar {
   display: flex;
   align-items: center;
@@ -43,4 +47,29 @@ svg {
   display: grid;
   grid-gap: 30px;
   grid-template-columns: 1fr 1fr;
+}
+
+
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.info circle {
+  fill: steelblue;
+}
+
+.info text {
+  font-size: 14px;
+}
+
+.tooltip {
+  fill: white;
+  stroke: #000;
+}
+
+.tooltip-date, .tooltip-values {
+  color: black;
+  font-weight: bold;
 }

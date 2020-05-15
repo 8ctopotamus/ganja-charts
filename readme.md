@@ -29,8 +29,7 @@ http://bl.ocks.org/linssen/7352810
 
 https://blockbuilder.org/nivas8292/222939d7c74c5de09387
 
-https://observablehq.com/@d3/click-to-recenter-brush
-
-https://github.com/d3/d3-zoom/issues/48
-
 https://www.d3indepth.com/scales/
+
+tooltip: https://mappingwithd3.com/tutorials/basics/tooltip/
+http://bl.ocks.org/biovisualize/1016860
