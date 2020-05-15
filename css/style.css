@@ -3,7 +3,7 @@ svg {
 }
 
 .area {
-  fill: steelblue;
+  fill: #4ea3dc;
   clip-path: url(#clip);
 }
 
@@ -57,7 +57,7 @@ svg {
 }
 
 .info circle {
-  fill: steelblue;
+  fill: rgb(20, 55, 70);;
 }
 
 .info text {

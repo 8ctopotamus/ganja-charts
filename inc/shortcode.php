@@ -1,7 +1,7 @@
 <?php
 // shortcode
 function g_charts_shortcode( $atts ) {
-	$resolutions = ['1 Week', '1 Month', '3 Months', '1 YEAR', '5 Years', 'Ytd', 'Max'];
+	$resolutions = ['1 Week', '1 Month', '3 Months', '1 Year', '5 Years', 'Ytd', 'Max'];
 
 	$html = '
 		<h2>Cannabis World Index</h2>
@@ -12,7 +12,7 @@ function g_charts_shortcode( $atts ) {
 	$currentYear = $now->format('Y');
 	foreach($resolutions as $resolution) {
 		if ($resolution == 'Max') {
-			$fromDate='';
+			$fromDate=''; //NOTE: set in JS
 		} else if ($resolution == 'Ytd') {
 			$fromDate = $now->modify('first day of January ' . $currentYear);
 			$fromDate = $fromDate->format('Y-m-d h:i:s');

@@ -20,12 +20,7 @@
   let error = null;
 
   // const parseDate = d3.time.format("%s").parse;
-  var parseDate = d3.time.format("%m/%e/%Y").parse,
-      bisectDate = d3.bisector(function(d) { console.log(d); return d.timestamp; }).left,
-      formatValue = d3.format(","),
-      dateFormatter = d3.time.format("%m/%d/%y");
-  // var bisect = d3.bisector(function(d) { return d.x; }).left;
-  // const bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
+  const bisectDate = d3.bisector(function(d) { console.log(d); return d.timestamp; }).left;
 
   const setError = val => {
     errorMsg.innerHTML = val;
@@ -46,7 +41,6 @@
     const {
       body,
       response,
-      query,
       errors,
     } = solactive_data;
     if (!response || response.code !== 200 || !!errors) {
@@ -148,7 +142,7 @@
         .attr("y", -6)
         .attr("height", height2 + 7);
 
-    var info = focus.append("g")
+    let info = focus.append("g")
         .attr("class", "info")
         .style("display", "none");
 
@@ -157,7 +151,7 @@
 
     info.append("rect")
         .attr("class", "tooltip")
-        .attr("width", 100)
+        .attr("width", 132)
         .attr("height", 50)
         .attr("x", 10)
         .attr("y", -22)
@@ -174,7 +168,7 @@
         .attr("y", 18)
         .text("Value:");
 
-    const valuesInfo = info.append("text")
+    info.append("text")
         .attr("class", "tooltip-values")
         .attr("x", 60)
         .attr("y", 18);
@@ -188,15 +182,14 @@
         .on("mousemove", mousemove);
 
     function mousemove() {
-      console.log('mousemove')
-        var x0 = x.invert(d3.mouse(this)[0]),
-            i = bisectDate(data, x0, 1),
-            d0 = data[i - 1],
-            d1 = data[i],
-            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-        info.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
-        info.select(".tooltip-date").text(dateFromTimestamp(d.timestamp));
-        info.select(".tooltip-values").text(d.value);
+      var x0 = x.invert(d3.mouse(this)[0]),
+          i = bisectDate(data, x0, 1),
+          d0 = data[i - 1],
+          d1 = data[i],
+          d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+      info.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
+      info.select(".tooltip-date").text(dateFromTimestamp(d.timestamp));
+      info.select(".tooltip-values").text(d.value);
     }
 
 
@@ -222,7 +215,7 @@
       zoom.translate(t);
       focus.select(".area").attr("d", area);
       focus.select(".x.axis").call(xAxis);
-      //Find extent of zoomed area, what's currently at edges of graphed region
+      // Find extent of zoomed area, what's currently at edges of graphed region
       let brushExtent = [x.invert(0), x.invert(width)];
       context.select(".brush").call(brush.extent(brushExtent));
     }
@@ -230,21 +223,21 @@
     function handleDateChange() {
       const from = new Date(fromInput.value).getTime();
       const to = new Date(toInput.value).getTime();
-      brush.extent([from, to])
-      brush(d3.select('.brush').transition())
-      brush.event(d3.select('.brush').transition().delay(1000))
+      brush.extent([from, to]);
+      brush(d3.select('.brush').transition());
+      brush.event(d3.select('.brush').transition().delay(1000));
     }
 
     function handleButtonClick() {
       fromInput.value = new Date(this.dataset.from).toDateInputValue();
       toInput.value = new Date().toDateInputValue();
-      handleDateChange()
+      handleDateChange();
     }
 
     // set controls defaults
-    const dates = data.map(function(d) { return d.timestamp; })
-    const min = d3.min(dates)
-    const max = d3.max(dates)
+    const dates = data.map(function(d) { return d.timestamp; });
+    const min = d3.min(dates);
+    const max = d3.max(dates);
     fromInput.value = new Date(min).toDateInputValue();
     toInput.value = new Date(max).toDateInputValue();
     fromInput.min = new Date(min).toDateInputValue();
@@ -254,12 +247,12 @@
     // wire up controls
     fromInput.addEventListener('change', handleDateChange);
     toInput.addEventListener('change', handleDateChange);
-    const btns = Array.from(document.querySelectorAll('.btn-resolution'))
+    const btns = Array.from(document.querySelectorAll('.btn-resolution'));
     btns.forEach(function(btn) {
       if (btn.dataset.resolution === 'Max') {
-        btn.dataset.from = dateFromTimestamp(min)
+        btn.dataset.from = dateFromTimestamp(min);
       }
-      btn.addEventListener('click', handleButtonClick)
+      btn.addEventListener('click', handleButtonClick);
     })
   };
 
@@ -271,7 +264,8 @@
     const prevQuoteValue = parseFloat(values[values.length - 2]);
     document.getElementById('last-quote-date').innerText = lastQuoteDate;
     document.getElementById('last-quote-value').innerText = lastQuoteValue;
-    document.getElementById('day-change').innerText = `Prev: ${prevQuoteValue} - Current: ${lastQuoteValue} = Difference: ${(lastQuoteValue - prevQuoteValue).toFixed(2)}`;
+    // dayChange = prev - current 
+    document.getElementById('day-change').innerText = `${(lastQuoteValue - prevQuoteValue).toFixed(2)}`;
 
     // Year range can show the highest and lowest closing prices since January 1.
     const d = new Date();
