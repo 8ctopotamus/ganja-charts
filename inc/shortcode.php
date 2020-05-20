@@ -67,6 +67,10 @@ function g_charts_shortcode( $atts ) {
 						<th>Year range</th>
 						<td><span id="year-range"></span></td>
 					</tr>
+					<tr>
+						<th>Abs./Rel.</th>
+						<td><span id="abs-rel"></span>%</td>
+					</tr>
 				</table>
 			</div>
 		</div>

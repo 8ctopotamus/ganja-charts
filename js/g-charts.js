@@ -20,7 +20,7 @@
   let error = null;
 
   // const parseDate = d3.time.format("%s").parse;
-  const bisectDate = d3.bisector(function(d) { console.log(d); return d.timestamp; }).left;
+  const bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
   const setError = val => {
     errorMsg.innerHTML = val;
@@ -81,7 +81,9 @@
         .y0(height2)
         .y1(function(d) { return y2(d.value); });
 
-    let svg = d3.select("#g-chart-d3").append("svg")
+    let svg = d3.select("#g-chart-d3")
+      .append("svg")
+        .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
 
@@ -149,26 +151,40 @@
     info.append("circle")
         .attr("r", 5);
 
-    info.append("rect")
+    const defaultTipX = {
+      tooltipRect: 10,
+      tooltipDate: 18,
+      tooltipText: 18,
+      tooltipValue: 60,
+    }
+
+    const altTipX = {
+      tooltipRect: -155,
+      tooltipDate: -145,
+      tooltipText: -145,
+      tooltipValue: -100,
+    }
+
+    const tooltipRect = info.append("rect")
         .attr("class", "tooltip")
-        .attr("width", 132)
+        .attr("width", 142)
         .attr("height", 50)
-        .attr("x", 10)
+        .attr("x", defaultTipX.tooltipRect)
         .attr("y", -22)
         .attr("rx", 4)
         .attr("ry", 4);
 
-    info.append("text")
+    const tooltipDate = info.append("text")
         .attr("class", "tooltip-date")
-        .attr("x", 18)
+        .attr("x", defaultTipX.tooltipDate)
         .attr("y", -2);
 
-    info.append("text")
+    const tooltipText = info.append("text")
         .attr("x", 18)
         .attr("y", 18)
         .text("Value:");
 
-    info.append("text")
+    const tooltipValue = info.append("text")
         .attr("class", "tooltip-values")
         .attr("x", 60)
         .attr("y", 18);
@@ -187,6 +203,19 @@
           d0 = data[i - 1],
           d1 = data[i],
           d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+      if (i < data.length/2) {
+        tooltipRect.attr('x', defaultTipX.tooltipRect)
+        tooltipDate.attr('x', defaultTipX.tooltipDate)
+        tooltipText.attr('x', defaultTipX.tooltipText)
+        tooltipValue.attr('x', defaultTipX.tooltipValue)
+      } else {
+        tooltipRect.attr('x', altTipX.tooltipRect)
+        tooltipDate.attr('x', altTipX.tooltipDate)
+        tooltipText.attr('x', altTipX.tooltipText)
+        tooltipValue.attr('x', altTipX.tooltipValue)
+      }
+
       info.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
       info.select(".tooltip-date").text(dateFromTimestamp(d.timestamp));
       info.select(".tooltip-values").text(d.value);
@@ -265,27 +294,18 @@
     document.getElementById('last-quote-date').innerText = lastQuoteDate;
     document.getElementById('last-quote-value').innerText = lastQuoteValue;
     // dayChange = prev - current 
-    document.getElementById('day-change').innerText = `${(lastQuoteValue - prevQuoteValue).toFixed(2)}`;
-
+    const dayChange = `${(lastQuoteValue - prevQuoteValue).toFixed(2)}`;
+    document.getElementById('day-change').innerText = dayChange;
     // Year range can show the highest and lowest closing prices since January 1.
     const d = new Date();
     const currentYear = d.getFullYear();
-    const jan1Idx = dates.findIndex(d => {
-      return d.split(' ')[3] == currentYear;
-    });
-    const yearSlice = data.slice(jan1Idx);
-    const max = yearSlice.reduce((max, p) => p.value > max ? p.value : max, data[0].value);      
-    const min = yearSlice.reduce((min, p) => p.value < min ? p.value : min, data[0].value);
+    const jan1Idx = dates.findIndex(d => d.split(' ')[3] == currentYear);
+    const yearSlice = data.slice(jan1Idx).map(d => d.value);
+    const min = d3.min(yearSlice)
+    const max = d3.max(yearSlice)
+    const rel = (dayChange / lastQuoteValue) * 100;
     document.getElementById('year-range').innerText = `High: ${max} | Low: ${min}`;
-  
-    // Change abs = the return over a one day span.
-    // Today's close minus yesterday's close = abs.
-    // 28.35 - 28.80 = -.45
-    
-    // rel appears to be relative change, and is the abs expressed in a percentage I think.
-    // (28.35 - 28.80) / 28.80 = 1.56
-    
-    // These are for April 21, with 28.35 being today's stated close and 28.80 being yesterday's.  
+    document.getElementById('abs-rel').innerText = `$${dayChange}/${rel.toFixed(2)}`;
   }
 
   const init = () => {

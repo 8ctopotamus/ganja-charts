@@ -49,8 +49,6 @@ svg {
   grid-template-columns: 1fr 1fr;
 }
 
-
-
 .overlay {
   fill: none;
   pointer-events: all;
@@ -72,4 +70,9 @@ svg {
 .tooltip-date, .tooltip-values {
   color: black;
   font-weight: bold;
+}
+
+@media (max-width: 767px) {
+  #g-chart-stats { display: block; }
+  .btn-resolution { display: none; }
 }
