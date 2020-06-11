@@ -26,6 +26,15 @@
     errorMsg.innerHTML = val;
   }
 
+  function calcTimeOffset(offset, ts) {
+    d = new Date(ts)
+    utc = d.getTime() + (d.getTimezoneOffset() * 60000) + (3600000 * offset)
+    return utc
+  }
+
+  calcTimeOffset('-2', 1591905072607) // give correct
+
+
   const dateFromTimestamp = ts => {
     const parts = new Date(ts).toUTCString().split(' ');
     const [dOw, d, m, y] = parts
@@ -52,7 +61,8 @@
       setError(error);
       throw new Error(error);
     }
-    return JSON.parse(body);
+
+    return JSON.parse(body).map(d => ({value: d.value, timestamp: calcTimeOffset('+2', d.timestamp)}));
   }
 
   const drawChart = () => {
@@ -97,7 +107,7 @@
         .attr("class", "focus")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       
-    let zoom = d3.behavior.zoom().scaleExtent([1,1000])
+    let zoom = d3.behavior.zoom().scaleExtent([0, 10000])
         .on("zoom", zoomed);
       
     let context = svg.append("g")
@@ -105,6 +115,7 @@
         .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
     x.domain(d3.extent(data.map(function(d) { return d.timestamp; })));
+
     y.domain([0, parseFloat(d3.max(data.map(function(d) { return d.value; }))) + 30]);
     x2.domain(x.domain());
     y2.domain(y.domain());
@@ -200,11 +211,10 @@
     function mousemove() {
       var x0 = x.invert(d3.mouse(this)[0]),
           i = bisectDate(data, x0, 1),
-          d0 = data[i - 1],
+          d0 = data[i],
           d1 = data[i],
-          d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-
-      if (i < data.length/2) {
+          d = x0 - d0.date >= d1.date - x0 ? d1 : d0;
+      if (i <= data.length / 2) {
         tooltipRect.attr('x', defaultTipX.tooltipRect)
         tooltipDate.attr('x', defaultTipX.tooltipDate)
         tooltipText.attr('x', defaultTipX.tooltipText)
@@ -215,12 +225,10 @@
         tooltipText.attr('x', altTipX.tooltipText)
         tooltipValue.attr('x', altTipX.tooltipValue)
       }
-
       info.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
       info.select(".tooltip-date").text(dateFromTimestamp(d.timestamp));
       info.select(".tooltip-values").text(d.value);
     }
-
 
     function brushed() {
       x.domain(brush.empty() ? x2.domain() : brush.extent());
@@ -264,15 +272,17 @@
     }
 
     // set controls defaults
-    const dates = data.map(function(d) { return d.timestamp; });
+    const dates = data.map(function(d) { return d.timestamp } );
     const min = d3.min(dates);
     const max = d3.max(dates);
+
     fromInput.value = new Date(min).toDateInputValue();
-    toInput.value = new Date(max).toDateInputValue();
+    toInput.value = new Date().toDateInputValue();
     fromInput.min = new Date(min).toDateInputValue();
     fromInput.max = new Date(max).toDateInputValue();
     toInput.min = new Date(min).toDateInputValue();
-    toInput.max = new Date(max).toDateInputValue();
+    toInput.max = new Date().toDateInputValue();
+
     // wire up controls
     fromInput.addEventListener('change', handleDateChange);
     toInput.addEventListener('change', handleDateChange);
@@ -310,6 +320,7 @@
 
   const init = () => {
     data = parseSolactiveData(solactive_data);
+
     if (data) {
       renderStats();
       drawChart();
